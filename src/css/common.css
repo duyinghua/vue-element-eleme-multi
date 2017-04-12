@@ -1,0 +1,4 @@
+* { margin: 0; padding: 0; }
+.container, .page-container { width: 1140px; padding: 0 30px; margin: 0 auto; }
+.sider { min-height: 600px }
+.body { margin-top: 40px; }
