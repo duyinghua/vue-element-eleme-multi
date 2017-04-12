@@ -11,7 +11,7 @@ var chunks = Object.keys(entries);
 var config = {
     entry: entries,
     output: {
-        publicPath: "/cdn/",
+        publicPath: "/cdn",
         path: path.join(__dirname, 'dist'),
         filename: '[name].js?[hash]'
     },
@@ -97,15 +97,23 @@ var head = `<title> title</title>
 <script type="text/javascript" src="http://pub.quanminxingtan.com/web/weixin/js/lib/zepto.min_e388b4e.js"></script>`;
 pages.forEach(function (pathname) {
     console.log('==================', pathname)
-    config.plugins.push(new HtmlWebpackPlugin({
+    var conf = {
         head: head,
         alwaysWriteToDisk: true,
         filename: path.join(ROOT, pathname + '.html'), //生成的html存放路径，相对于path
         template: path.join(ROOT, 'tpl', pathname + '.html')  //html模板路径
-    }));
+    }
+    if (pathname in config.entry) {
+        conf.favicon = 'src/imgs/favicon.ico';
+        conf.inject = 'body';
+        conf.chunks = ['vendors', pathname];
+        conf.hash = true;
+    }
+    config.plugins.push(new HtmlWebpackPlugin(conf));
 });
 function getEntry(globPath, pathDir) {
     var files = glob.sync(globPath);
+    console.log('==================-------', files)
     var entries = {},
         entry, dirname, basename, pathname, extname;
 
@@ -116,7 +124,7 @@ function getEntry(globPath, pathDir) {
         basename = path.basename(entry, extname);
         pathname = path.join(dirname, basename);
         pathname = pathDir ? pathname.replace(new RegExp('^' + pathDir), '') : pathname;
-        entries[pathname] = './' + entry;
+        entries[pathname] = ['./' + entry];
     }
     return entries;
 }
